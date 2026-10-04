@@ -14,6 +14,7 @@ public sealed class Anchor
     public double X { get; set; }
     public double Y { get; set; }
     public double Length { get; set; } = 16;
+    public double LengthRatio { get; set; } = 0.2;
     public double Thickness { get; set; } = 2;
     public double Gap { get; set; } = 5;
     public double DotSize { get; set; } = 3;
@@ -21,6 +22,7 @@ public sealed class Anchor
     public double Inset { get; set; } = 24;
     public double CornerRadius { get; set; } = 8;
     public double Spacing { get; set; } = 120;
+    public double ColumnSpacing { get; set; } = 40;
     public double Depth { get; set; } = 100;
     public double Width { get; set; } = 128;
     public double Height { get; set; } = 128;
@@ -39,6 +41,9 @@ public sealed class Preset
     public Anchor Corners { get; set; } = new() { Length = 24, Opacity = 0.25 };
     public Anchor Grid { get; set; } = new() { Enabled = false, Opacity = 0.08, Thickness = 1 };
     public Anchor Vignette { get; set; } = new() { Enabled = false, Color = "#000000", Opacity = 0.25 };
+    public Anchor EdgeBars { get; set; } = new() { Enabled = false, Thickness = 8, LengthRatio = 0.25, Inset = 0, Gap = 24 };
+    public Anchor Thirds { get; set; } = new() { Enabled = false, Thickness = 12 };
+    public Anchor EdgeDots { get; set; } = new() { Enabled = false, Size = 24, Spacing = 80 };
     public Anchor Png { get; set; } = new() { Enabled = false, Opacity = 0.35 };
 }
 
@@ -79,8 +84,8 @@ public sealed class Configuration
                     if (!double.IsFinite(value) || Math.Abs(value) > 20000 || (n.Name != "X" && n.Name != "Y" && value < 0))
                         throw new InvalidOperationException("尺寸必须有限且在 0–20000 DIP 内（偏移允许负数）。");
                 }
-                if (a.Opacity > 1 || a.Spacing < 8 || a.Thickness > 100)
-                    throw new InvalidOperationException("透明度范围 0–1，网格间距至少 8，线宽最多 100。");
+                if (a.LengthRatio > 1 || a.Opacity > 1 || a.Spacing < 8 || a.Thickness > 100)
+                    throw new InvalidOperationException("长度比例与透明度范围 0–1，网格间距至少 8，线宽最多 100。");
                 if (a.ImagePath is null) throw new InvalidOperationException("图片路径不能为 null。");
                 if (a.ImagePath.Length > 0) LocalFilePolicy.Check(a.ImagePath);
             }
@@ -109,5 +114,41 @@ public static class PresetManager
         if (config.Presets.Count == 1) throw new InvalidOperationException("至少保留一个预设。");
         config.Presets.Remove(config.Active);
         config.ActivePresetId = config.Presets[0].Id;
+    }
+}
+
+public static class BuiltInPresets
+{
+    public static Preset[] Create()
+    {
+        Preset Blank(string name) => new()
+        {
+            Name = name,
+            Crosshair = new() { Enabled = false },
+            Border = new() { Enabled = false },
+            Corners = new() { Enabled = false }
+        };
+        var bars = Blank("方案一 · 四向瞄准线");
+        bars.EdgeBars.Enabled = true;
+        var thirds = Blank("方案二 · 三等分竖条");
+        thirds.Thirds.Enabled = true;
+        var dots = Blank("方案三 · 两侧大圆点");
+        dots.EdgeDots.Enabled = true;
+        var cross = Blank("方案四 · 中心十字");
+        cross.Crosshair.Enabled = true;
+        var dot = Blank("方案五 · 中心圆点");
+        dot.CenterDot.Enabled = true;
+        dot.CenterDot.Size = 6;
+        return new[] { bars, thirds, dots, cross, dot };
+    }
+
+    public static void Add(Configuration config, Preset template)
+    {
+        if (config.Presets.Count >= 100) throw new InvalidOperationException("最多 100 个预设。");
+        var preset = JsonSerializer.Deserialize<Preset>(JsonSerializer.Serialize(template))!;
+        preset.Id = Guid.NewGuid().ToString("N");
+        config.Presets.Add(preset);
+        config.ActivePresetId = preset.Id;
+        config.Validate();
     }
 }

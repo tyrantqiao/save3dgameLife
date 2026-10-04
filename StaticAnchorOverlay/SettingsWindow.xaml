@@ -21,6 +21,7 @@
     </StackPanel>
     <Border DockPanel.Dock="Bottom" Padding="0,10,0,0"><TextBlock x:Name="StatusText" TextWrapping="Wrap" Foreground="#64748B"/></Border>
     <TabControl Background="Transparent" BorderThickness="0">
+      <TabItem Header="方案示意"><ScrollViewer VerticalScrollBarVisibility="Auto"><StackPanel x:Name="SchemePanel" Margin="0,12,0,0"/></ScrollViewer></TabItem>
       <TabItem Header="锚点"><ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,12,0,0"><StackPanel x:Name="EditorPanel"/></ScrollViewer></TabItem>
       <TabItem Header="应用"><ScrollViewer VerticalScrollBarVisibility="Auto"><StackPanel Margin="0,16,0,0">
         <TextBlock Text="显示屏" FontWeight="SemiBold" Margin="0,0,0,8"/>

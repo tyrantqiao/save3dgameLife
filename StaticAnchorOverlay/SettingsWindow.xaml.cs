@@ -25,8 +25,11 @@ public partial class SettingsWindow : Window
     {
         RefreshMonitors(); refreshing = true;
         PresetBox.ItemsSource = null; PresetBox.ItemsSource = app.Config.Presets; PresetBox.SelectedItem = app.Config.Active;
-        EditorPanel.Children.Clear(); HotkeyPanel.Children.Clear();
+        EditorPanel.Children.Clear(); HotkeyPanel.Children.Clear(); BuildSchemes();
         var p = app.Config.Active;
+        Group("四向瞄准线", p.EdgeBars, "LengthRatio:长度比例（0–1）", "Thickness:条宽", "Gap:距中心间隙", "Inset:距边缘");
+        Group("三等分竖条（贯穿全高）", p.Thirds, "Thickness:条宽");
+        Group("两侧大圆点", p.EdgeDots, "Size:圆点直径", "Spacing:圆点纵向间距", "ColumnSpacing:两列间距", "Inset:距边缘");
         Group("中心十字准星", p.Crosshair, "Length:线长", "Thickness:线宽", "Gap:间隙", "DotSize:中心圆点直径");
         Group("屏幕边框", p.Border, "Inset:内缩距离", "Thickness:厚度", "CornerRadius:圆角半径");
         Group("中心点", p.CenterDot, "Size:直径");
@@ -35,11 +38,52 @@ public partial class SettingsWindow : Window
         Group("四角标记", p.Corners, "Length:线段长度", "Thickness:粗细", "Inset:距离角落");
         Group("低透明度网格", p.Grid, "Spacing:间距（至少 8）", "Thickness:线宽");
         Group("暗角 / 边缘渐变", p.Vignette, "Depth:渐变深度");
-        Group("自定义 PNG（颜色不影响图片）", p.Png, "Width:宽度", "Height:高度", "ImagePath:本地 PNG 路径");
+        Group("中心自定义准心 PNG（颜色不影响图片）", p.Png, "Width:宽度", "Height:高度", "ImagePath:本地 PNG 路径");
         AddHotkeyEditor();
         RefreshStartup();
         StatusText.Text = app.Warning ?? "展开锚点可调整外观；更多细项见高级参数。";
         refreshing = false;
+    }
+    private void BuildSchemes()
+    {
+        SchemePanel.Children.Clear();
+        SchemePanel.Children.Add(new TextBlock
+        {
+            Text = "固定在屏幕上的参照，不随游戏视角移动。以下为布局示意，背景不是游戏截图；以 960 × 540 DIP 演示。添加后可在“锚点”中调整。",
+            TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 0, 0, 12)
+        });
+        string[] descriptions =
+        {
+            "四条线从上下左右边缘朝向中心，每条长度为对应屏幕尺寸的 25%；条宽 8 DIP。",
+            "宽度的 1/3、2/3 处各一根竖条，长度为屏幕高度的 100%；条宽 12 DIP。",
+            "左右各两列交错圆点，内列错开半个纵向间距，直径 24 DIP、纵向间距 80 DIP、列间距 40 DIP，距边缘 24 DIP。",
+            "中心十字：四臂、中央间隙与圆点均可调整。",
+            "中心圆点：直径 6 DIP，也可搭配边缘方案。"
+        };
+        var templates = BuiltInPresets.Create();
+        for (int i = 0; i < templates.Length; i++)
+        {
+            var template = templates[i];
+            var panel = new StackPanel { Margin = new Thickness(12) };
+            panel.Children.Add(new TextBlock { Text = template.Name, FontWeight = FontWeights.SemiBold });
+            panel.Children.Add(new TextBlock { Text = descriptions[i] + " 默认透明度 35%。", TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 6, 0, 8) });
+            var surface = new AnchorSurface { Width = 960, Height = 540 };
+            surface.Update(template);
+            panel.Children.Add(new Border
+            {
+                Background = new SolidColorBrush(Color.FromRgb(30, 41, 59)),
+                Child = new Viewbox { Child = surface, Stretch = Stretch.Uniform }, Height = 180
+            });
+            var button = new Button { Content = "添加并使用此方案", HorizontalAlignment = HorizontalAlignment.Left, Margin = new Thickness(0, 8, 0, 0) };
+            button.Click += (_, _) => Run(() => { BuiltInPresets.Add(app.Config, template); Commit(); Reload(); });
+            panel.Children.Add(button);
+            SchemePanel.Children.Add(new Border { Background = Brushes.White, Margin = new Thickness(0, 0, 0, 12), Child = panel });
+        }
+        SchemePanel.Children.Add(new TextBlock
+        {
+            Text = "自定义准心：在“锚点 → 中心自定义准心 PNG”选择本地透明 PNG，选择后自动启用。宽高与偏移可调，X/Y = 0 时位于屏幕中心；可关闭十字与中心点避免重叠。视觉与身体运动信号不一致可能参与眩晕，不能简单归因于鼠标绑定；本工具仅提供参照，不保证缓解效果。",
+            TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 0, 0, 12)
+        });
     }
     private void Group(string title, Anchor anchor, params string[] fields)
     {
@@ -141,7 +185,7 @@ public partial class SettingsWindow : Window
     private void ChoosePng(object sender, RoutedEventArgs e)
     {
         var dialog = new OpenFileDialog { Filter = "PNG 图片|*.png" };
-        if (dialog.ShowDialog(this) == true) Run(() => { app.Config.Active.Png.ImagePath = dialog.FileName; app.Config.Validate(); Commit(); Reload(); });
+        if (dialog.ShowDialog(this) == true) Run(() => { LocalFilePolicy.Check(dialog.FileName); app.Config.Active.Png.ImagePath = dialog.FileName; app.Config.Active.Png.Enabled = true; app.Config.Validate(); Commit(); Reload(); });
     }
     private void ToggleOverlay(object sender, RoutedEventArgs e) => app.Toggle();
     private void OpenPresetMenu(object sender, RoutedEventArgs e)
@@ -180,4 +224,3 @@ public partial class SettingsWindow : Window
     }
     private void ExitApplication(object sender, RoutedEventArgs e) => app.ExitApplication();
 }
-

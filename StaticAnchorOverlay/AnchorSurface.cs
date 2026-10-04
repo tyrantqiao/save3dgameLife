@@ -97,6 +97,47 @@ public sealed class AnchorSurface : FrameworkElement
                 dc.DrawLine(pen, new Point(x, y), new Point(x, y - sy * a.Length));
             }
         });
+        Draw(preset.EdgeBars, (_, pen, x, y) =>
+        {
+            var a = preset.EdgeBars;
+            double left = a.Inset + a.X, right = w - a.Inset + a.X;
+            double top = a.Inset + a.Y, bottom = h - a.Inset + a.Y;
+            double horizontal = Math.Max(0, Math.Min(w * a.LengthRatio, w / 2 - a.Inset - a.Gap));
+            double vertical = Math.Max(0, Math.Min(h * a.LengthRatio, h / 2 - a.Inset - a.Gap));
+            if (horizontal > 0)
+            {
+                dc.DrawLine(pen, new Point(left, y), new Point(left + horizontal, y));
+                dc.DrawLine(pen, new Point(right, y), new Point(right - horizontal, y));
+            }
+            if (vertical > 0)
+            {
+                dc.DrawLine(pen, new Point(x, top), new Point(x, top + vertical));
+                dc.DrawLine(pen, new Point(x, bottom), new Point(x, bottom - vertical));
+            }
+        });
+        Draw(preset.Thirds, (_, pen, _, _) =>
+        {
+            var a = preset.Thirds;
+            foreach (double x in new[] { w / 3, w * 2 / 3 })
+                dc.DrawLine(pen, new Point(x + a.X, a.Y), new Point(x + a.X, h + a.Y));
+        });
+        Draw(preset.EdgeDots, (brush, _, _, _) =>
+        {
+            var a = preset.EdgeDots;
+            double radius = a.Size / 2, inset = Math.Max(a.Inset, radius);
+            int count = (int)Math.Max(0, Math.Floor((h - 2 * inset) / a.Spacing) + 1);
+            double start = (h - (count - 1) * a.Spacing) / 2;
+            // Place inner dots midway between outer dots, keeping both sides symmetric.
+            for (int i = 0; i < count; i++)
+            {
+                double y = start + i * a.Spacing + a.Y;
+                foreach (double x in new[] { inset, w - inset })
+                    dc.DrawEllipse(brush, null, new Point(x + a.X, y), radius, radius);
+                if (i < count - 1)
+                    foreach (double x in new[] { inset + a.ColumnSpacing, w - inset - a.ColumnSpacing })
+                        dc.DrawEllipse(brush, null, new Point(x + a.X, y + a.Spacing / 2), radius, radius);
+            }
+        });
         Draw(preset.Crosshair, (brush, pen, x, y) =>
         {
             var a = preset.Crosshair;

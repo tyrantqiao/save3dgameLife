@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="780" viewBox="0 0 1040 780">
+<style>text{font-family:Microsoft YaHei,Arial,sans-serif;fill:#e2e8f0}.title{font-size:24px}.label{font-size:19px}.note{font-size:15px}.anchor{stroke:white;stroke-opacity:.35;fill:none}</style>
+<rect width="1040" height="780" fill="#0f172a"/>
+<text x="32" y="42" class="title">静态视觉锚点 · 五种预设布局</text>
+<text x="32" y="70" class="note">布局示意，非游戏截图。白色锚点保持在屏幕固定位置；默认透明度 35%。</text>
+<g transform="translate(32 112)">
+<text class="label">方案一 · 四向瞄准线</text>
+<rect y="18" width="460" height="259" rx="4" fill="#1e293b"/>
+<g class="anchor" stroke-width="4">
+<path d="M0 147.5H115 M345 147.5H460 M230 18V82.75 M230 212.25V277"/>
+</g>
+<text y="302" class="note">从四边朝向中心，每条长为屏幕对应尺寸的 25%</text>
+</g>
+<g transform="translate(548 112)">
+<text class="label">方案二 · 三等分竖条（100% 高）</text>
+<rect y="18" width="460" height="259" rx="4" fill="#1e293b"/>
+<path class="anchor" stroke-width="6" d="M153.33 18V277 M306.67 18V277"/>
+<text y="302" class="note">位于宽度 1/3、2/3，条宽 12 DIP</text>
+</g>
+<g transform="translate(32 462)">
+<text class="label">方案三 · 两侧大圆点</text>
+<rect y="18" width="460" height="259" rx="4" fill="#1e293b"/>
+<g fill="white" fill-opacity=".35">
+<circle cx="11.5" cy="32.5" r="5.75"/><circle cx="11.5" cy="70.8" r="5.75"/><circle cx="11.5" cy="109.2" r="5.75"/><circle cx="11.5" cy="147.5" r="5.75"/><circle cx="11.5" cy="185.8" r="5.75"/><circle cx="11.5" cy="224.2" r="5.75"/><circle cx="11.5" cy="262.5" r="5.75"/>
+<circle cx="448.5" cy="32.5" r="5.75"/><circle cx="448.5" cy="70.8" r="5.75"/><circle cx="448.5" cy="109.2" r="5.75"/><circle cx="448.5" cy="147.5" r="5.75"/><circle cx="448.5" cy="185.8" r="5.75"/><circle cx="448.5" cy="224.2" r="5.75"/><circle cx="448.5" cy="262.5" r="5.75"/>
+<circle cx="30.7" cy="51.65" r="5.75"/><circle cx="30.7" cy="90" r="5.75"/><circle cx="30.7" cy="128.35" r="5.75"/><circle cx="30.7" cy="166.65" r="5.75"/><circle cx="30.7" cy="205" r="5.75"/><circle cx="30.7" cy="243.35" r="5.75"/><circle cx="429.3" cy="51.65" r="5.75"/><circle cx="429.3" cy="90" r="5.75"/><circle cx="429.3" cy="128.35" r="5.75"/><circle cx="429.3" cy="166.65" r="5.75"/><circle cx="429.3" cy="205" r="5.75"/><circle cx="429.3" cy="243.35" r="5.75"/></g>
+<text y="302" class="note">每侧两列交错，直径 24 DIP、纵距 80 DIP、列距 40 DIP</text>
+</g>
+<g transform="translate(548 462)">
+<text class="label">方案四 · 中心十字</text>
+<rect y="18" width="216" height="122" rx="4" fill="#1e293b"/>
+<path class="anchor" stroke-width="1" d="M98 79H105.6 M110.4 79H118 M108 69V76.6 M108 81.4V89"/>
+<circle cx="108" cy="79" r=".75" fill="white" fill-opacity=".35"/>
+<text x="244" class="label">方案五 · 中心圆点</text>
+<rect x="244" y="18" width="216" height="122" rx="4" fill="#1e293b"/>
+<circle cx="352" cy="79" r="1.5" fill="white" fill-opacity=".35"/>
+<text y="175" class="note">自定义准心：选择透明 PNG，可调整宽高和偏移</text>
+<text y="205" class="note">X/Y = 0 时居中，可关闭其他中心元素避免重叠</text>
+<text y="250" class="note">仅提供固定视觉参照，不保证缓解眩晕。</text>
+</g>
+</svg>
