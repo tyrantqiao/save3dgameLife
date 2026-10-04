@@ -6,7 +6,13 @@
   </Window.Resources>
   <DockPanel Margin="20">
     <StackPanel DockPanel.Dock="Top">
-      <TextBlock Text="静态视觉锚点" FontSize="24" FontWeight="SemiBold"/>
+      <Grid Margin="0,0,0,4">
+        <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+        <Border Background="Transparent" MouseLeftButtonDown="DragSettingsWindow" Cursor="SizeAll" ToolTip="按住此处拖动设置窗口">
+          <TextBlock Text="静态视觉锚点" FontSize="24" FontWeight="SemiBold" VerticalAlignment="Center"/>
+        </Border>
+        <Button Grid.Column="1" Content="关闭设置 ×" Click="CloseSettings" ToolTip="收起设置到任务栏，叠加继续运行" Margin="12,0,0,0" VerticalAlignment="Center"/>
+      </Grid>
       <TextBlock Text="修改即生效 · 自动保存" Foreground="#64748B" Margin="0,4,0,16"/>
       <Grid Margin="0,0,0,12">
         <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>

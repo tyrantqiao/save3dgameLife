@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using Microsoft.Win32;
 
@@ -222,5 +223,12 @@ public partial class SettingsWindow : Window
         e.Cancel = true;
         WindowState = WindowState.Minimized;
     }
+    private void DragSettingsWindow(object sender, MouseButtonEventArgs e)
+    {
+        if (e.LeftButton != MouseButtonState.Pressed) return;
+        e.Handled = true;
+        DragMove();
+    }
+    private void CloseSettings(object sender, RoutedEventArgs e) => Close();
     private void ExitApplication(object sender, RoutedEventArgs e) => app.ExitApplication();
 }
